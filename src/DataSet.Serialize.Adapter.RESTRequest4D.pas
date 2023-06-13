@@ -2,7 +2,7 @@ unit DataSet.Serialize.Adapter.RESTRequest4D;
 
 interface
 
-uses RESTRequest4D.Request.Adapter.Contract{$IFNDEF FPC}, DB{$ENDIF}, DataSet.Serialize;
+uses RESTRequest4D.Request.Adapter.Contract, DataSet.Serialize{$IF DEFINED(FPC)}, DB{$ELSE}, Data.DB{$ENDIF};
 
 type
   TDataSetSerializeAdapter = class(TInterfacedObject, IRequestAdapter)
@@ -51,9 +51,13 @@ end;
 
 procedure TDataSetSerializeAdapter.Execute(const AContent: string);
 begin
+  {$IFNDEF FPC}
   ActiveCachedUpdates(FDataSet, False);
+  {$ENDIF}
   FDataSet.LoadFromJSON(aContent);
+  {$IFNDEF FPC}
   ActiveCachedUpdates(FDataSet, True);
+  {$ENDIF}
 end;
 
 class function TDataSetSerializeAdapter.New(const ADataSet: TDataSet): IRequestAdapter;
